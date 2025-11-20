@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Task Manager App</title>
+    <title>Task Manager</title>
     <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
@@ -12,14 +12,12 @@
             <h1>Task Manager</h1>
             <label class="switch">
                 <input type="checkbox" id="themeToggle">
-                <span class="slider"></span>
+                <span class="slider round"></span>
             </label>
         </div>
 
-        <p class="subtitle">Plan your day smartly</p>
-
         <div class="input-group">
-            <input type="text" id="taskInput" placeholder="Enter new task..." />
+            <input type="text" id="taskInput" placeholder="Enter new task..."/>
             <button id="addTaskBtn">Add</button>
         </div>
 
@@ -28,9 +26,6 @@
         <button id="clearTasksBtn" class="clear-btn">Clear All</button>
     </div>
 
-    <!-- Firebase Setup -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
