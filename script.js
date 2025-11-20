@@ -1,59 +1,78 @@
-const addBtn = document.getElementById('addBtn');
+// Firebase Config
+const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    projectId: "YOUR_PROJECT",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
 const taskInput = document.getElementById('taskInput');
+const addTaskBtn = document.getElementById('addTaskBtn');
+const clearBtn = document.getElementById('clearTasksBtn');
 const taskList = document.getElementById('taskList');
+const themeToggle = document.getElementById('themeToggle');
 
-window.onload = loadTasks;
+// Load tasks
+window.onload = () => {
+    loadTasks();
+    if (localStorage.getItem('theme') === 'dark') {
+        document.body.classList.add('dark');
+        themeToggle.checked = true;
+    }
+};
 
-// Add Task Event
-addBtn.addEventListener('click', addTask);
+themeToggle.addEventListener('change', () => {
+    document.body.classList.toggle('dark');
+    localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+});
 
+// Add task
+addTaskBtn.addEventListener('click', addTask);
 function addTask() {
-  if (taskInput.value.trim() === '') {
-    alert('Please enter a task');
-    return;
-  }
-
-  createTaskElement(taskInput.value);
-  saveTasks();
-  taskInput.value = '';
+    const text = taskInput.value.trim();
+    if (!text) return alert('Enter a task');
+    
+    db.collection("tasks").add({ text, completed: false });
+    taskInput.value = "";
+    loadTasks();
 }
 
-function createTaskElement(taskText, completed = false) {
-  const li = document.createElement('li');
-  li.textContent = taskText;
-
-  if (completed) li.classList.add('completed');
-
-  li.addEventListener('click', () => {
-    li.classList.toggle('completed');
-    saveTasks();
-  });
-
-  const deleteBtn = document.createElement('button');
-  deleteBtn.textContent = '✖';
-  deleteBtn.classList.add('delete-btn');
-  deleteBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    li.remove();
-    saveTasks();
-  });
-
-  li.appendChild(deleteBtn);
-  taskList.appendChild(li);
-}
-
-function saveTasks() {
-  const tasks = [];
-  document.querySelectorAll('li').forEach(li => {
-    tasks.push({
-      text: li.firstChild.textContent.trim(),
-      completed: li.classList.contains('completed')
+// Load tasks
+async function loadTasks() {
+    taskList.innerHTML = "";
+    const snapshot = await db.collection("tasks").get();
+    snapshot.forEach(doc => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+            <span onclick="toggleComplete('${doc.id}', ${doc.data().completed})" class="${doc.data().completed ? 'completed' : ''}">${doc.data().text}</span>
+            <button onclick="deleteTask('${doc.id}')" class="delete-btn">X</button>`;
+        taskList.appendChild(li);
     });
-  });
-  localStorage.setItem('tasks', JSON.stringify(tasks));
 }
 
-function loadTasks() {
-  const savedTasks = JSON.parse(localStorage.getItem('tasks')) || [];
-  savedTasks.forEach(task => createTaskElement(task.text, task.completed));
+// Toggle complete
+function toggleComplete(id, state) {
+    db.collection("tasks").doc(id).update({ completed: !state });
+    loadTasks();
 }
+
+// Delete task
+function deleteTask(id) {
+    db.collection("tasks").doc(id).delete();
+    loadTasks();
+}
+
+// Clear all tasks
+clearBtn.addEventListener('click', async () => {
+    if (confirm('Clear all tasks?')) {
+        const snapshot = await db.collection("tasks").get();
+        snapshot.forEach(doc => doc.ref.delete());
+        loadTasks();
+    }
+});
