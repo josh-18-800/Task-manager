@@ -2,76 +2,22 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Simple Task Manager</title>
-  <style>
-    body { font-family: Arial, sans-serif; background:#f4f4f4; display:flex; justify-content:center; align-items:center; height:100vh; }
-    .container { background:white; padding:20px; border-radius:8px; width:350px; box-shadow:0 0 10px rgba(0,0,0,0.1); }
-    h2 { text-align:center; }
-    input { width:75%; padding:8px; }
-    button { padding:8px 10px; cursor:pointer; }
-    ul { list-style:none; padding:0; margin-top:15px; }
-    li { background:#eee; margin:5px 0; padding:10px; display:flex; justify-content:space-between; border-radius:5px; }
-    li.completed { text-decoration:line-through; color:gray; }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Task Manager</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-
   <div class="container">
-    <h2>Task Manager</h2>
-    <input id="taskInput" type="text" placeholder="Enter a task" />
-    <button onclick="addTask()">Add</button>
-    
+    <h1>Task Manager</h1>
+
+    <div class="input-section">
+      <input type="text" id="taskInput" placeholder="Enter a new task..." />
+      <button id="addBtn">Add Task</button>
+    </div>
+
     <ul id="taskList"></ul>
   </div>
 
-  <script>
-    const input = document.getElementById('taskInput');
-    const list = document.getElementById('taskList');
-
-    // Load saved tasks
-    window.onload = loadTasks;
-
-    function addTask() {
-      if (input.value === '') return alert("Please enter a task");
-
-      const li = document.createElement('li');
-      li.textContent = input.value;
-      
-      // Click marks complete
-      li.addEventListener('click', () => {
-        li.classList.toggle('completed');
-        saveTasks();
-      });
-
-      // Right-click deletes
-      li.addEventListener('contextmenu', (e) => {
-        e.preventDefault();
-        li.remove();
-        saveTasks();
-      });
-
-      list.appendChild(li);
-      input.value = '';
-      saveTasks();
-    }
-
-    // Save tasks to localStorage
-    function saveTasks() {
-      localStorage.setItem('tasks', list.innerHTML);
-    }
-
-    // Load tasks on startup
-    function loadTasks() {
-      list.innerHTML = localStorage.getItem('tasks') || '';
-      // Reassign events to existing tasks
-      document.querySelectorAll('li').forEach(li => {
-        li.addEventListener('click', () => {
-          li.classList.toggle('completed');
-          saveTasks();
-        });
-        li.addEventListener('contextmenu', (e) => {
-          e.preventDefault();
-          li.remove();
-          saveTasks();
-        });
+  <script src="script.js"></script>
+</body>
+</html>
